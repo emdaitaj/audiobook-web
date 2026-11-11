@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Audiobook</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Audio<span>book</span></h1>
+    <div class="sub" id="health">local TTS</div>
+  </header>
+
+  <!-- ------------------------------------------------ new conversion -->
+  <div class="card">
+    <div class="tabs">
+      <button id="tabFile" class="on" type="button">File</button>
+      <button id="tabText" type="button">Paste text</button>
+    </div>
+
+    <div id="paneFile">
+      <div class="drop" id="drop">
+        <b>Tap to choose a file</b>
+        <small>PDF · EPUB · DOCX · Markdown · HTML · TXT</small>
+      </div>
+      <input type="file" id="file" hidden
+             accept=".pdf,.epub,.docx,.docm,.md,.markdown,.mdx,.html,.htm,.xhtml,.txt,.text,.rst,.org,.log">
+    </div>
+
+    <div id="paneText" hidden>
+      <label class="field">
+        <span>title (optional)</span>
+        <input type="text" id="title" placeholder="chapter 3">
+      </label>
+      <label class="field">
+        <span>text — plain, Markdown or HTML</span>
+        <textarea id="text" placeholder="Paste anything here."></textarea>
+      </label>
+      <label class="field">
+        <span>read as</span>
+        <select id="fmt">
+          <option value="auto">detect automatically</option>
+          <option value="txt">plain text</option>
+          <option value="md">Markdown</option>
+          <option value="html">HTML</option>
+        </select>
+      </label>
+    </div>
+
+    <hr class="rule">
+
+    <label class="field">
+      <span>voice engine</span>
+      <div class="tabs" id="engines"></div>
+      <small class="hint" id="engineNote"></small>
+    </label>
+
+    <!-- Kokoro: a fixed cast -->
+    <div id="paneKokoro">
+      <label class="field">
+        <span>voice</span>
+        <select id="voice"></select>
+      </label>
+    </div>
+
+    <!-- OmniVoice: design a voice, or clone one -->
+    <div id="paneOmni" hidden>
+      <div class="tabs small">
+        <button id="tabDesign" class="on" type="button">Design a voice</button>
+        <button id="tabClone" type="button">Clone a voice</button>
+      </div>
+
+      <div id="paneDesign">
+        <div id="attrs"></div>
+        <small class="hint" id="voicePreview"></small>
+      </div>
+
+      <div id="paneClone" hidden>
+        <div class="drop" id="refDrop">
+          <b>Tap to choose a voice clip</b>
+          <small>a few seconds of clear speech &middot; WAV, MP3, M4A, OGG, FLAC</small>
+        </div>
+        <input type="file" id="refAudio" hidden accept="audio/*,.wav,.mp3,.m4a,.ogg,.flac,.opus">
+        <label class="field" style="margin-top:12px">
+          <span>what the clip says (optional &mdash; it will listen if you skip this)</span>
+          <input type="text" id="refText" placeholder="exactly the words spoken in the clip">
+        </label>
+      </div>
+
+      <label class="field">
+        <span>language</span>
+        <select id="lang"></select>
+      </label>
+    </div>
+
+    <div class="row" style="margin-top:4px">
+      <label class="field">
+        <span>narration speed</span>
+        <select id="speed">
+          <option value="0.8">0.8&times;</option>
+          <option value="0.9">0.9&times;</option>
+          <option value="1.0" selected>1.0&times;</option>
+          <option value="1.1">1.1&times;</option>
+          <option value="1.25">1.25&times;</option>
+        </select>
+      </label>
+      <label class="field" id="wpmField" hidden>
+        <span>pace <b id="wpmVal">165</b> wpm</span>
+        <input type="range" id="wpm" min="120" max="220" step="5" value="165">
+      </label>
+    </div>
+
+    <button class="go" id="go" type="button">Convert to audio</button>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <!-- ------------------------------------------------ player -->
+  <div class="card player" id="player" hidden>
+    <div class="title" id="pTitle">—</div>
+    <div class="livetag" id="liveTag" hidden></div>
+    <audio id="audio" preload="metadata"></audio>
+
+    <input type="range" class="scrub" id="scrub" min="0" max="1000" value="0" step="1">
+    <div class="times"><span id="tCur">0:00</span><span id="tDur">0:00</span></div>
+
+    <div class="transport">
+      <button class="play" id="play" type="button" aria-label="play">&#9654;</button>
+    </div>
+
+    <div class="seeks" id="seekBack"></div>
+    <div class="seeks" id="seekFwd"></div>
+
+    <div class="speedrow">
+      <span>playback</span>
+      <input type="range" id="rate" min="50" max="250" step="5" value="100">
+      <span id="rateVal" style="min-width:52px;text-align:right">1.00&times;</span>
+    </div>
+    <div class="ratebtns">
+      <button id="rateDown" type="button">&minus;0.05&times;</button>
+      <button id="rateReset" type="button">Reset to 1.00&times;</button>
+      <button id="rateUp" type="button">+0.05&times;</button>
+    </div>
+
+    <div class="mini">
+      <button id="toggleText" type="button">Show text</button>
+      <a id="dl" href="#">Download MP3</a>
+      <a id="tx" href="#" target="_blank" rel="noopener">Transcript</a>
+      <button id="closePlayer" type="button">Close</button>
+    </div>
+
+    <div id="reader" hidden>
+      <div class="readerbar">
+        <span id="readerNote"></span>
+        <button id="followBtn" type="button" class="on">Follow</button>
+      </div>
+      <div id="readerBody" class="readerbody"></div>
+    </div>
+  </div>
+
+  <!-- ------------------------------------------------ jobs -->
+  <div class="card">
+    <div class="sub" style="margin-bottom:6px">Recent</div>
+    <div id="jobs"><div class="sub">nothing yet</div></div>
+  </div>
+
+  <p class="sub" style="text-align:center">
+    <a href="#" id="signout" style="color:var(--muted)">sign out</a>
+  </p>
+  <p class="sub" style="text-align:center;font-size:12px">
+    <a href="https://github.com/emdaitaj/audiobook-web" target="_blank" rel="noopener"
+       style="color:var(--muted)">audiobook-web by emdaitaj</a>
+  </p>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>

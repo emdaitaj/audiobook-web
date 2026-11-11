@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Audiobook</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="login">
+  <form method="post" action="/api/login">
+    <h1>Audio<span>book</span></h1>
+    <div class="card">
+      <label class="field">
+        <span>password</span>
+        <input type="password" name="password" autocomplete="current-password"
+               autocapitalize="none" autocorrect="off" autofocus>
+      </label>
+      <button class="go" type="submit">Sign in</button>
+      <div class="err">{{ERROR}}</div>
+    </div>
+    <p class="sub" style="text-align:center">Asked once. This browser stays signed in for a year.</p>
+    <p class="sub" style="text-align:center;font-size:12px">
+      <a href="https://github.com/emdaitaj/audiobook-web" target="_blank" rel="noopener"
+         style="color:var(--muted)">audiobook-web by emdaitaj</a>
+    </p>
+  </form>
+</div>
+</body>
+</html>

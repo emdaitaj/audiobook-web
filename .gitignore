@@ -1,0 +1,11 @@
+# secrets and local state - never commit
+config.json
+data/
+*.log
+.claude/
+
+# python
+.venv/
+venv/
+__pycache__/
+*.pyc
