@@ -269,8 +269,9 @@ Kokoro is English-only and will mispronounce anything else, so use OmniVoice
 with the right language for other scripts. An engine whose virtualenv is
 missing is shown greyed out instead of being offered and then failing.
 
-OmniVoice reads numbers and dates as written, because the library that spells
-them out has no Windows build.
+Numbers and dates are read as words with both engines. Kokoro does it itself;
+for OmniVoice the converter spells them out first (see the
+[converter README](https://github.com/emdaitaj/doc-to-audiobook#choosing-a-voice-engine)).
 
 ## License
 
